@@ -26,8 +26,8 @@ export default async function handler(req, res) {
   if (!['15m', '1h', '4h', '1d'].includes(timeframe)) {
     return res.status(400).json({ error: 'Invalid timeframe. Supported: 15m, 1h, 4h, 1d' });
   }
-  if (!['scalp', 'swing', 'position'].includes(signalType)) {
-    return res.status(400).json({ error: 'Invalid signalType. Supported: scalp, swing, position' });
+  if (!['scalp', 'intraday', 'swing'].includes(signalType)) {
+    return res.status(400).json({ error: 'Invalid signalType. Supported: scalp, intraday, swing' });
   }
   if (!['conservative', 'moderate', 'aggressive'].includes(riskTolerance)) {
     return res.status(400).json({ error: 'Invalid riskTolerance. Supported: conservative, moderate, aggressive' });

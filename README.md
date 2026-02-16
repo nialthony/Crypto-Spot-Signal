@@ -28,7 +28,7 @@ A sophisticated web application that analyzes cryptocurrency markets in real-tim
 - **Multi-Indicator Analysis**: RSI, MACD, Bollinger Bands, EMA20, EMA50, ATR, Momentum
 - **8 Trading Pairs**: BTC, ETH, SOL, BNB, XRP, ADA, AVAX, DOGE
 - **4 Timeframes**: 15-minute, 1-hour, 4-hour, daily charts
-- **3 Trading Styles**: Scalp (1-2%), Swing (3-8%), Position (10-20%)
+- **3 Trading Styles**: Scalp (1-2%), Intraday (2-4%), Swing (3-8%)
 - **Risk Tolerance Levels**: Conservative, Moderate, Aggressive
 - **Futures Pulse Layer**: Funding rate, long/short ratio, open interest trend
 - **Catalyst Watch**: News sentiment + trending topic boost
@@ -115,7 +115,7 @@ npm start
 
 1. **Select Trading Pair**: Choose from 8 major cryptocurrencies
 2. **Pick Timeframe**: Select analysis period (15m/1h/4h/1d)
-3. **Choose Signal Type**: Scalp, Swing, or Position trading
+3. **Choose Signal Type**: Scalp, Intraday, or Swing trading
 4. **Set Risk Tolerance**: Conservative, Moderate, or Aggressive
 5. **Generate Signal**: Click the button and get instant analysis!
 
@@ -194,7 +194,7 @@ Generate a trading signal programmatically.
 **Query Parameters:**
 - `symbol` (required): Trading pair (e.g., BTCUSDT)
 - `timeframe` (required): Analysis period (15m/1h/4h/1d)
-- `signalType` (required): Trading style (scalp/swing/position)
+- `signalType` (required): Trading style (scalp/intraday/swing)
 - `riskTolerance` (required): Risk level (conservative/moderate/aggressive)
 
 **Example Request:**

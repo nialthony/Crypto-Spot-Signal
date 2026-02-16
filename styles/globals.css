@@ -41,10 +41,39 @@ body {
   letter-spacing: 0.4px;
 }
 
+@keyframes pixelBorderPulse {
+  0%, 100% {
+    border-color: #3d604a;
+    outline-color: rgba(126, 247, 189, 0.22);
+  }
+  25% {
+    border-color: #5f8d70;
+    outline-color: rgba(137, 214, 255, 0.22);
+  }
+  50% {
+    border-color: #6b6f4a;
+    outline-color: rgba(255, 211, 124, 0.22);
+  }
+  75% {
+    border-color: #4f7c62;
+    outline-color: rgba(156, 255, 151, 0.2);
+  }
+}
+
 .container {
   max-width: 1180px;
   margin: 0 auto;
   padding: 20px 14px 56px;
+}
+
+.form-card,
+.quality-panel,
+.indicator-card,
+.reason-item,
+.rr-badge,
+.disclaimer {
+  outline: 1px solid transparent;
+  animation: pixelBorderPulse 2.8s steps(4, end) infinite;
 }
 
 .header {

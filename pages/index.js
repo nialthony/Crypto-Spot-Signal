@@ -21,8 +21,8 @@ const TIMEFRAMES = [
 
 const SIGNAL_TYPES = [
   { value: 'scalp', label: 'Scalp' },
+  { value: 'intraday', label: 'Intraday' },
   { value: 'swing', label: 'Swing' },
-  { value: 'position', label: 'Position' },
 ];
 
 const RISK_LEVELS = [
