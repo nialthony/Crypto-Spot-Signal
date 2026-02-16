@@ -38,6 +38,18 @@ function fmt(n, decimals) {
   return n.toFixed(decimals ?? 4);
 }
 
+function fmtPct(n, decimals = 2) {
+  if (n == null) return '-';
+  return `${n >= 0 ? '+' : ''}${n.toFixed(decimals)}%`;
+}
+
+function toneClass(n) {
+  if (n == null) return '';
+  if (n > 0) return 'pct-pos';
+  if (n < 0) return 'pct-neg';
+  return '';
+}
+
 export default function Home() {
   const [symbol, setSymbol] = useState('BTCUSDT');
   const [timeframe, setTimeframe] = useState('4h');
@@ -67,14 +79,14 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Crypto Spot Trade Signal</title>
+        <title>Crypto Futures Signal</title>
       </Head>
 
       <div className="container">
         {/* Header */}
         <header className="header">
-          <h1>Crypto Spot Trade Signal</h1>
-          <p>AI-powered technical analysis for smarter trading decisions</p>
+          <h1>Crypto Futures Signal</h1>
+          <p>Futures intelligence with technical confluence, catalyst watch, and liquidity heat map</p>
         </header>
 
         {/* Form */}
@@ -202,6 +214,113 @@ export default function Home() {
               </div>
             )}
 
+            {/* Futures Pulse */}
+            {data.futuresContext && (
+              <div style={{ marginBottom: 24 }}>
+                <h3 style={{ fontSize: 14, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.5px', color: 'var(--text-dim)', marginBottom: 10 }}>
+                  Futures Pulse
+                </h3>
+                <div className="indicators-grid">
+                  <div className="indicator-card">
+                    <div className="label">Funding Rate</div>
+                    <div className={`value ${toneClass(data.futuresContext.fundingRate?.current)}`}>
+                      {data.futuresContext.fundingRate?.current != null ? fmtPct(data.futuresContext.fundingRate.current * 100, 3) : '-'}
+                    </div>
+                  </div>
+                  <div className="indicator-card">
+                    <div className="label">Funding Annualized</div>
+                    <div className={`value ${toneClass(data.futuresContext.fundingRate?.annualizedPct)}`}>
+                      {data.futuresContext.fundingRate?.annualizedPct != null ? fmtPct(data.futuresContext.fundingRate.annualizedPct, 2) : '-'}
+                    </div>
+                  </div>
+                  <div className="indicator-card">
+                    <div className="label">Open Interest Change</div>
+                    <div className={`value ${toneClass(data.futuresContext.openInterest?.changePct)}`}>
+                      {data.futuresContext.openInterest?.changePct != null ? fmtPct(data.futuresContext.openInterest.changePct, 2) : '-'}
+                    </div>
+                  </div>
+                  <div className="indicator-card">
+                    <div className="label">Long/Short Ratio</div>
+                    <div className="value">
+                      {data.futuresContext.longShortRatio?.ratio != null ? data.futuresContext.longShortRatio.ratio.toFixed(2) : '-'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Catalyst Watch */}
+            {data.catalystWatch && (
+              <div style={{ marginBottom: 24 }}>
+                <h3 style={{ fontSize: 14, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.5px', color: 'var(--text-dim)', marginBottom: 10 }}>
+                  Catalyst Watch
+                </h3>
+                <div className="indicators-grid" style={{ marginBottom: 10 }}>
+                  <div className="indicator-card">
+                    <div className="label">Catalyst Score</div>
+                    <div className={`value ${toneClass(data.catalystWatch.combinedScore)}`}>
+                      {data.catalystWatch.combinedScore ?? '-'}
+                    </div>
+                  </div>
+                  <div className="indicator-card">
+                    <div className="label">Sentiment Bias</div>
+                    <div className="value">{data.catalystWatch.sentimentLabel || '-'}</div>
+                  </div>
+                  <div className="indicator-card">
+                    <div className="label">Trend Boost</div>
+                    <div className={`value ${toneClass(data.catalystWatch.trendBoost)}`}>
+                      {data.catalystWatch.trendBoost != null ? fmtPct(data.catalystWatch.trendBoost, 1) : '-'}
+                    </div>
+                  </div>
+                  <div className="indicator-card">
+                    <div className="label">Symbol Trending Rank</div>
+                    <div className="value">
+                      {data.catalystWatch.symbolTrendingRank ? `#${data.catalystWatch.symbolTrendingRank}` : '-'}
+                    </div>
+                  </div>
+                </div>
+                {(data.catalystWatch.catalysts || []).slice(0, 4).map((item, idx) => (
+                  <div className="reason-item" key={`cat-${idx}`}>
+                    <span style={{ flexShrink: 0 }}>{idx + 1}.</span>
+                    <span>
+                      [{item.sentiment}] {item.title} {item.source ? `(${item.source})` : ''}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Liquidity Heat Map */}
+            {data.liquidityHeatmap && (
+              <div style={{ marginBottom: 24 }}>
+                <h3 style={{ fontSize: 14, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.5px', color: 'var(--text-dim)', marginBottom: 10 }}>
+                  Liquidity Heat Map
+                </h3>
+                <table className="levels-table">
+                  <thead>
+                    <tr><th>Zone</th><th>Price</th><th>Intensity</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Nearest Support</td>
+                      <td>${fmt(data.liquidityHeatmap.supportZones?.[0]?.center)}</td>
+                      <td>{data.liquidityHeatmap.supportZones?.[0]?.intensity != null ? `${data.liquidityHeatmap.supportZones[0].intensity}%` : '-'}</td>
+                    </tr>
+                    <tr>
+                      <td>Nearest Resistance</td>
+                      <td>${fmt(data.liquidityHeatmap.resistanceZones?.[0]?.center)}</td>
+                      <td>{data.liquidityHeatmap.resistanceZones?.[0]?.intensity != null ? `${data.liquidityHeatmap.resistanceZones[0].intensity}%` : '-'}</td>
+                    </tr>
+                    <tr>
+                      <td>Strongest Node</td>
+                      <td>${fmt(data.liquidityHeatmap.hotspots?.[0]?.center)}</td>
+                      <td>{data.liquidityHeatmap.hotspots?.[0]?.intensity != null ? `${data.liquidityHeatmap.hotspots[0].intensity}%` : '-'}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            )}
+
             {/* Reasons */}
             <div className="reasons-section">
               <h3>Analysis</h3>
@@ -255,6 +374,26 @@ export default function Home() {
                   <div className="label">EMA 50</div>
                   <div className="value">${fmt(data.indicators.ema50)}</div>
                 </div>
+                <div className="indicator-card">
+                  <div className="label">ATR 14</div>
+                  <div className="value">{fmt(data.indicators.atr14, 4)}</div>
+                </div>
+                <div className="indicator-card">
+                  <div className="label">Momentum 3</div>
+                  <div className={`value ${toneClass(data.indicators.momentum3)}`}>
+                    {data.indicators.momentum3 != null ? fmtPct(data.indicators.momentum3, 2) : '-'}
+                  </div>
+                </div>
+                <div className="indicator-card">
+                  <div className="label">Momentum 10</div>
+                  <div className={`value ${toneClass(data.indicators.momentum10)}`}>
+                    {data.indicators.momentum10 != null ? fmtPct(data.indicators.momentum10, 2) : '-'}
+                  </div>
+                </div>
+                <div className="indicator-card">
+                  <div className="label">Volume Ratio</div>
+                  <div className="value">{data.indicators.volumeRatio ?? '-'}</div>
+                </div>
               </div>
             </div>
 
@@ -267,7 +406,7 @@ export default function Home() {
 
         {/* Footer */}
         <footer className="footer">
-          Crypto Spot Trade Signal Agent &mdash; Built for{' '}
+          Crypto Futures Signal Agent &mdash; Built for{' '}
           <a href="https://avalon-vibe.devpost.com/" target="_blank" rel="noopener noreferrer">Avalon Vibe Hackathon 2026</a>
           {' '}&middot; Powered by <a href="https://creao.ai" target="_blank" rel="noopener noreferrer">CREAO</a>
         </footer>

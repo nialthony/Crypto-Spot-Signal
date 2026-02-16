@@ -1,6 +1,6 @@
-# 🚀 Crypto Spot Trade Signal
+# 🚀 Crypto Futures Signal
 
-**AI-powered cryptocurrency spot trading signal generator with advanced technical analysis**
+**AI-powered cryptocurrency futures signal generator with technical + catalyst intelligence**
 
 Live Demo: [Coming Soon - Deploy on Vercel]
 
@@ -25,13 +25,16 @@ A sophisticated web application that analyzes cryptocurrency markets in real-tim
 
 ### 🎯 Core Capabilities
 
-- **Multi-Indicator Analysis**: RSI, MACD, Bollinger Bands, EMA20, EMA50
+- **Multi-Indicator Analysis**: RSI, MACD, Bollinger Bands, EMA20, EMA50, ATR, Momentum
 - **8 Trading Pairs**: BTC, ETH, SOL, BNB, XRP, ADA, AVAX, DOGE
 - **4 Timeframes**: 15-minute, 1-hour, 4-hour, daily charts
 - **3 Trading Styles**: Scalp (1-2%), Swing (3-8%), Position (10-20%)
 - **Risk Tolerance Levels**: Conservative, Moderate, Aggressive
-- **Signal Confluence Scoring**: Combines multiple indicators for accuracy
-- **Real-time Data**: Fetches from Binance API with automatic CoinGecko fallback
+- **Futures Pulse Layer**: Funding rate, long/short ratio, open interest trend
+- **Catalyst Watch**: News sentiment + trending topic boost
+- **Liquidity Heat Map**: High-liquidity support/resistance node detection
+- **Signal Confluence Scoring**: Combines technical + derivatives + catalyst context
+- **Real-time Data**: Binance Futures API with automatic CoinGecko fallback
 
 ### 📊 Signal Output
 
@@ -53,13 +56,13 @@ Each signal includes:
 - **Frontend**: Next.js 14 + React 18
 - **API**: Serverless functions on Vercel
 - **Styling**: Custom CSS with dark theme
-- **Data Sources**: Binance API → CoinGecko API → Demo data fallback
+- **Data Sources**: Binance Futures API → CoinGecko API → Demo data fallback
 - **Deployment**: Vercel (zero-config deployment)
 
 ### Project Structure
 
 ```
-crypto-spot-signal/
+crypto-futures-signal/
 ├── lib/
 │   └── signalGenerator.js      # Core technical analysis engine
 ├── pages/
@@ -127,8 +130,7 @@ npm start
 
 #### SELL Signal (Red)
 - Indicators suggest price will likely decrease
-- For spot trading: exit positions or wait for better entry
-- For margin/futures: consider short position
+- For futures trading: consider short position or hedge long exposure
 - Same exit strategy as BUY signal
 
 #### HOLD Signal (Yellow)
@@ -271,7 +273,7 @@ curl "https://your-app.vercel.app/api/signal?symbol=BTCUSDT&timeframe=4h&signalT
 
 - [Next.js Documentation](https://nextjs.org/docs)
 - [Vercel Platform](https://vercel.com/docs)
-- [Binance API](https://binance-docs.github.io/apidocs/spot/en/)
+- [Binance Futures API](https://developers.binance.com/docs/derivatives/usds-margined-futures/market-data/rest-api)
 - [CoinGecko API](https://www.coingecko.com/en/api)
 - [Technical Analysis Education](https://www.tradingview.com/education/)
 

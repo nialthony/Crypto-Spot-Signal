@@ -1,4 +1,10 @@
-import { fetchOHLCV, generateSignal, SYMBOL_MAP } from '../../lib/signalGenerator';
+import {
+  fetchOHLCV,
+  fetchFuturesContext,
+  fetchCatalystWatch,
+  generateSignal,
+  SYMBOL_MAP,
+} from '../../lib/signalGenerator';
 
 export default async function handler(req, res) {
   if (req.method !== 'GET' && req.method !== 'POST') {
@@ -28,12 +34,20 @@ export default async function handler(req, res) {
   }
 
   try {
-    const ohlcv = await fetchOHLCV(symbol, timeframe);
+    const [ohlcv, futuresContext, catalystWatch] = await Promise.all([
+      fetchOHLCV(symbol, timeframe),
+      fetchFuturesContext(symbol, timeframe),
+      fetchCatalystWatch(symbol),
+    ]);
+
     if (!ohlcv.length) {
       return res.status(500).json({ error: 'Failed to fetch market data' });
     }
 
-    const result = generateSignal(ohlcv, signalType, riskTolerance);
+    const result = generateSignal(ohlcv, signalType, riskTolerance, {
+      futuresContext,
+      catalystWatch,
+    });
     result.symbol = symbol;
     result.symbolName = SYMBOL_MAP[symbol].name;
     result.timeframe = timeframe;
