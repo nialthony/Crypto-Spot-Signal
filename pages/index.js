@@ -50,6 +50,19 @@ function toneClass(n) {
   return '';
 }
 
+function scoreTone(score) {
+  if (score == null) return '';
+  if (score >= 75) return 'pct-pos';
+  if (score <= 40) return 'pct-neg';
+  return '';
+}
+
+function liquidationBiasLabel(bias) {
+  if (bias === 'LONGS_AT_RISK') return 'Longs At Risk';
+  if (bias === 'SHORTS_AT_RISK') return 'Shorts At Risk';
+  return 'Balanced';
+}
+
 export default function Home() {
   const [symbol, setSymbol] = useState('BTCUSDT');
   const [timeframe, setTimeframe] = useState('4h');
@@ -167,6 +180,34 @@ export default function Home() {
               </div>
             </div>
 
+            {/* Signal Quality */}
+            {data.signalQuality && (
+              <div className="quality-panel">
+                <div className="quality-head">
+                  <div>
+                    <div className="quality-title">Signal Quality</div>
+                    <div className="quality-sub">0-100 confluence score with factor breakdown</div>
+                  </div>
+                  <div className={`quality-score ${scoreTone(data.signalQuality.score)}`}>
+                    {data.signalQuality.score} <span>{data.signalQuality.grade}</span>
+                  </div>
+                </div>
+                <div className="quality-bar">
+                  <div className="quality-fill" style={{ width: `${Math.min(100, data.signalQuality.score)}%` }} />
+                </div>
+                <div className="quality-metrics">
+                  <div>Confluence: {data.signalQuality.confluencePoints}</div>
+                  <div>Opposition: {data.signalQuality.oppositionPoints}</div>
+                </div>
+                {(data.signalQuality.breakdown || []).map((item) => (
+                  <div className="quality-row" key={item.key}>
+                    <span>{item.label}</span>
+                    <span>{item.points} ({item.contributionPct}%)</span>
+                  </div>
+                ))}
+              </div>
+            )}
+
             {/* Price */}
             <div className="price-row">${fmt(data.currentPrice)}</div>
 
@@ -211,6 +252,70 @@ export default function Home() {
             {data.signal !== 'HOLD' && (
               <div style={{ marginBottom: 24 }}>
                 <span className="rr-badge">Risk / Reward &nbsp; 1 : {data.riskReward}</span>
+              </div>
+            )}
+
+            {/* Liquidation Risk Meter */}
+            {data.liquidationRiskMeter && (
+              <div style={{ marginBottom: 24 }}>
+                <h3 style={{ fontSize: 14, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.5px', color: 'var(--text-dim)', marginBottom: 10 }}>
+                  Liquidation Risk Meter
+                </h3>
+                <div className="quality-panel">
+                  <div className="quality-head">
+                    <div>
+                      <div className="quality-title">{data.liquidationRiskMeter.level}</div>
+                      <div className="quality-sub">{liquidationBiasLabel(data.liquidationRiskMeter.bias)}</div>
+                    </div>
+                    <div className={`quality-score ${scoreTone(data.liquidationRiskMeter.score)}`}>
+                      {data.liquidationRiskMeter.score}
+                    </div>
+                  </div>
+                  <div className="quality-bar">
+                    <div className="quality-fill" style={{ width: `${Math.min(100, data.liquidationRiskMeter.score)}%` }} />
+                  </div>
+                  <div className="quality-metrics">
+                    <div>Long Risk: {data.liquidationRiskMeter.longRiskScore}</div>
+                    <div>Short Risk: {data.liquidationRiskMeter.shortRiskScore}</div>
+                  </div>
+                  {(data.liquidationRiskMeter.factors || []).slice(0, 3).map((item, idx) => (
+                    <div className="quality-row" key={`liq-${idx}`}>
+                      <span>{item}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Breakout vs Fakeout Detector */}
+            {data.breakoutFakeoutDetector && (
+              <div style={{ marginBottom: 24 }}>
+                <h3 style={{ fontSize: 14, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.5px', color: 'var(--text-dim)', marginBottom: 10 }}>
+                  Breakout vs Fakeout Detector
+                </h3>
+                <div className="quality-panel">
+                  <div className="quality-head">
+                    <div>
+                      <div className="quality-title">{data.breakoutFakeoutDetector.pattern.replace(/_/g, ' ')}</div>
+                      <div className="quality-sub">{data.breakoutFakeoutDetector.summary}</div>
+                    </div>
+                    <div className={`quality-score ${scoreTone(data.breakoutFakeoutDetector.confidence)}`}>
+                      {data.breakoutFakeoutDetector.confidence}
+                    </div>
+                  </div>
+                  {data.breakoutFakeoutDetector.breakLevel && (
+                    <div className="quality-metrics">
+                      <div>Break Level: ${fmt(data.breakoutFakeoutDetector.breakLevel)}</div>
+                      <div>Bias: {data.breakoutFakeoutDetector.bias}</div>
+                    </div>
+                  )}
+                  {data.breakoutFakeoutDetector.metrics && (
+                    <div className="quality-metrics">
+                      <div>Body Ratio: {data.breakoutFakeoutDetector.metrics.bodyRatio ?? '-'}</div>
+                      <div>Volume Ratio: {data.breakoutFakeoutDetector.metrics.volumeRatio ?? '-'}</div>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 
