@@ -265,30 +265,29 @@ export default function Home() {
         </div>
         <div className="terminal-screen">
           <div className="container">
-            <div className="sponsor-bar">
-              <span className="sponsor-label">Sponsored by</span>
-              <a
-                className="sponsor-link"
-                href="https://creao.ai"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="CREAO sponsor"
-              >
-                <img
-                  src="https://creao.ai/favicon.ico"
-                  alt="CREAO logo"
-                  width="18"
-                  height="18"
-                />
-                <span>creao.ai</span>
-              </a>
-            </div>
-
             {/* Header */}
             <header className="header terminal-header">
-              <p className="terminal-line">$ boot catalyst8-signal --mode futures</p>
-              <h1>Catalyst8 Signal</h1>
-              <p>Terminal market intelligence with confluence, catalyst watch, and liquidity heat map</p>
+              <div className="terminal-header-main">
+                <p className="terminal-line">$ boot catalyst8-signal --mode futures</p>
+                <h1>Catalyst8 Signal</h1>
+                <p>Terminal market intelligence with confluence, catalyst watch, and liquidity heat map</p>
+              </div>
+              <div className="sponsor-bar">
+                <a
+                  className="sponsor-link"
+                  href="https://creao.ai"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="CREAO sponsor"
+                >
+                  <img
+                    src="https://creao.ai/favicon.ico"
+                    alt="CREAO logo"
+                    width="24"
+                    height="24"
+                  />
+                </a>
+              </div>
             </header>
 
             <div className="form-card terminal-command-panel">
