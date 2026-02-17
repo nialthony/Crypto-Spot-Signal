@@ -38,7 +38,7 @@ export default async function handler(req, res) {
   try {
     const [ohlcv, futuresContext, catalystWatch] = await Promise.all([
       fetchOHLCV(normalizedSymbol, timeframe, 120, { geckoId }),
-      fetchFuturesContext(normalizedSymbol, timeframe),
+      fetchFuturesContext(normalizedSymbol, timeframe, { geckoId }),
       fetchCatalystWatch(normalizedSymbol, {
         geckoId,
         coinName: symbolName,

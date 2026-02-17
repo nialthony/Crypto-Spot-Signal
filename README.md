@@ -36,7 +36,7 @@ A sophisticated web application that analyzes cryptocurrency markets in real-tim
 - **Catalyst Watch**: News sentiment + trending topic boost
 - **Liquidity Heat Map**: High-liquidity support/resistance node detection
 - **Signal Confluence Scoring**: Combines technical + derivatives + catalyst context
-- **Real-time Data**: Binance Futures API with automatic CoinGecko fallback
+- **Real-time Data**: CoinGecko API with automatic demo-data fallback
 
 ### 📊 Signal Output
 
@@ -58,7 +58,7 @@ Each signal includes:
 - **Frontend**: Next.js 14 + React 18
 - **API**: Serverless functions on Vercel
 - **Styling**: Custom CSS with dark theme
-- **Data Sources**: Binance Futures API → CoinGecko API → Demo data fallback
+- **Data Sources**: CoinGecko API → Demo data fallback
 - **Deployment**: Vercel (zero-config deployment)
 
 ### Project Structure
@@ -103,8 +103,13 @@ npm install
 echo COINGECKO_API_KEY=your_key_here > .env.local
 
 # Optional: tune search-cache behavior (milliseconds)
-echo COIN_SEARCH_CACHE_TTL_MS=600000 >> .env.local
-echo COIN_SEARCH_CACHE_STALE_TTL_MS=3600000 >> .env.local
+echo COIN_SEARCH_CACHE_TTL_MS=1200000 >> .env.local
+echo COIN_SEARCH_CACHE_STALE_TTL_MS=43200000 >> .env.local
+echo NEXT_PUBLIC_COIN_SEARCH_CACHE_TTL_MS=480000 >> .env.local
+echo COIN_SEARCH_EDGE_FRESH_S=300 >> .env.local
+echo COIN_SEARCH_EDGE_STALE_S=1800 >> .env.local
+echo COIN_SEARCH_EDGE_STALE_FALLBACK_S=600 >> .env.local
+echo COIN_SEARCH_EDGE_STALE_FALLBACK_REVALIDATE_S=1800 >> .env.local
 
 # Optional (production): Upstash Redis distributed cache
 echo UPSTASH_REDIS_REST_URL=https://your-upstash-endpoint >> .env.local
@@ -115,6 +120,12 @@ npm run dev
 
 # Open http://localhost:3000 in your browser
 ```
+
+### Cache Presets (Recommended)
+
+- **Balanced (default in code)**: `COIN_SEARCH_CACHE_TTL_MS=1200000`, `COIN_SEARCH_CACHE_STALE_TTL_MS=43200000`, `COIN_SEARCH_EDGE_FRESH_S=300`
+- **High Traffic / Tight Rate Limit**: `COIN_SEARCH_CACHE_TTL_MS=1800000`, `COIN_SEARCH_CACHE_STALE_TTL_MS=86400000`, `COIN_SEARCH_EDGE_FRESH_S=600`
+- **Fastest Freshness**: `COIN_SEARCH_CACHE_TTL_MS=600000`, `COIN_SEARCH_CACHE_STALE_TTL_MS=21600000`, `COIN_SEARCH_EDGE_FRESH_S=120`
 
 ### Build for Production
 
@@ -290,7 +301,6 @@ curl "https://your-app.vercel.app/api/signal?symbol=BTCUSDT&geckoId=bitcoin&symb
 
 - [Next.js Documentation](https://nextjs.org/docs)
 - [Vercel Platform](https://vercel.com/docs)
-- [Binance Futures API](https://developers.binance.com/docs/derivatives/usds-margined-futures/market-data/rest-api)
 - [CoinGecko API](https://www.coingecko.com/en/api)
 - [Technical Analysis Education](https://www.tradingview.com/education/)
 
@@ -306,7 +316,7 @@ MIT License - Free to use for educational and non-commercial purposes
 
 - **Avalon Vibe Hackathon** for the opportunity
 - **CREAO Platform** for agentapp infrastructure
-- **Binance** and **CoinGecko** for free market data APIs
+- **CoinGecko** for market data APIs
 - **Vercel** for seamless serverless deployment
 - **Crypto Trading Community** for inspiration
 

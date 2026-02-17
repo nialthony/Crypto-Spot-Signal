@@ -7,7 +7,10 @@ const DEFAULT_COIN = {
   symbol: 'BTC',
   pair: 'BTCUSDT',
 };
-const COIN_SEARCH_CACHE_TTL_MS = 5 * 60 * 1000;
+const COIN_SEARCH_CACHE_TTL_MS = Math.max(
+  60 * 1000,
+  Number(process.env.NEXT_PUBLIC_COIN_SEARCH_CACHE_TTL_MS || 8 * 60 * 1000),
+);
 
 const TIMEFRAMES = [
   { value: '15m', label: '15 Min' },
@@ -213,7 +216,7 @@ export default function Home() {
         {/* Header */}
         <header className="header">
           <h1>Catalyst8 Signal</h1>
-          <p>Futures intelligence with technical confluence, catalyst watch, and liquidity heat map</p>
+          <p>Market intelligence with technical confluence, catalyst watch, and liquidity heat map</p>
         </header>
 
         {/* Form */}
@@ -483,11 +486,11 @@ export default function Home() {
               </div>
             )}
 
-            {/* Futures Pulse */}
+            {/* Market Pulse */}
             {data.futuresContext && (
               <div style={{ marginBottom: 24 }}>
                 <h3 style={{ fontSize: 14, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.5px', color: 'var(--text-dim)', marginBottom: 10 }}>
-                  Futures Pulse
+                  Market Pulse
                 </h3>
                 <div className="indicators-grid">
                   <div className="indicator-card">

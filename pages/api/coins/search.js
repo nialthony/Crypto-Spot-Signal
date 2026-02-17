@@ -4,8 +4,12 @@ import { Redis } from '@upstash/redis';
 const SEARCH_CACHE = new Map();
 const INFLIGHT = new Map();
 const MAX_CACHE_ITEMS = 400;
-const CACHE_TTL_MS = Number(process.env.COIN_SEARCH_CACHE_TTL_MS || 10 * 60 * 1000);
-const STALE_TTL_MS = Number(process.env.COIN_SEARCH_CACHE_STALE_TTL_MS || 60 * 60 * 1000);
+const DEFAULT_CACHE_TTL_MS = 20 * 60 * 1000;
+const DEFAULT_STALE_TTL_MS = 12 * 60 * 60 * 1000;
+const DEFAULT_EDGE_FRESH_S = 300;
+const DEFAULT_EDGE_STALE_S = 1800;
+const DEFAULT_EDGE_STALE_FALLBACK_S = 600;
+const DEFAULT_EDGE_STALE_FALLBACK_REVALIDATE_S = 1800;
 const REMOTE_CACHE_PREFIX = 'coin-search:v1:';
 const redis = process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
   ? new Redis({
@@ -13,6 +17,20 @@ const redis = process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_RE
       token: process.env.UPSTASH_REDIS_REST_TOKEN,
     })
   : null;
+
+function readNumberEnv(name, fallback, min, max) {
+  const raw = process.env[name];
+  const parsed = Number(raw);
+  if (!Number.isFinite(parsed)) return fallback;
+  return Math.max(min, Math.min(max, parsed));
+}
+
+const CACHE_TTL_MS = readNumberEnv('COIN_SEARCH_CACHE_TTL_MS', DEFAULT_CACHE_TTL_MS, 60 * 1000, 24 * 60 * 60 * 1000);
+const STALE_TTL_MS = readNumberEnv('COIN_SEARCH_CACHE_STALE_TTL_MS', DEFAULT_STALE_TTL_MS, CACHE_TTL_MS, 7 * 24 * 60 * 60 * 1000);
+const EDGE_FRESH_S = readNumberEnv('COIN_SEARCH_EDGE_FRESH_S', DEFAULT_EDGE_FRESH_S, 30, 3600);
+const EDGE_STALE_S = readNumberEnv('COIN_SEARCH_EDGE_STALE_S', DEFAULT_EDGE_STALE_S, 60, 24 * 3600);
+const EDGE_STALE_FALLBACK_S = readNumberEnv('COIN_SEARCH_EDGE_STALE_FALLBACK_S', DEFAULT_EDGE_STALE_FALLBACK_S, 30, 3600);
+const EDGE_STALE_FALLBACK_REVALIDATE_S = readNumberEnv('COIN_SEARCH_EDGE_STALE_FALLBACK_REVALIDATE_S', DEFAULT_EDGE_STALE_FALLBACK_REVALIDATE_S, EDGE_STALE_FALLBACK_S, 24 * 3600);
 
 function normalizeKeyword(raw) {
   return String(raw || '')
@@ -136,7 +154,7 @@ export default async function handler(req, res) {
   const localCached = getLocalCacheEntry(key);
   if (localCached && localCached.expiresAt > Date.now()) {
     res.setHeader('X-Cache', 'HIT_LOCAL');
-    res.setHeader('Cache-Control', 'public, s-maxage=120, stale-while-revalidate=300');
+    res.setHeader('Cache-Control', `public, s-maxage=${EDGE_FRESH_S}, stale-while-revalidate=${EDGE_STALE_S}`);
     return res.status(200).json({ coins: localCached.coins, cached: true });
   }
 
@@ -144,7 +162,7 @@ export default async function handler(req, res) {
   if (remoteCached && remoteCached.expiresAt > Date.now()) {
     setLocalCacheEntry(key, remoteCached);
     res.setHeader('X-Cache', 'HIT_REMOTE');
-    res.setHeader('Cache-Control', 'public, s-maxage=120, stale-while-revalidate=300');
+    res.setHeader('Cache-Control', `public, s-maxage=${EDGE_FRESH_S}, stale-while-revalidate=${EDGE_STALE_S}`);
     return res.status(200).json({ coins: remoteCached.coins, cached: true });
   }
 
@@ -156,13 +174,13 @@ export default async function handler(req, res) {
     setLocalCacheEntry(key, nextCache);
     await setDistributedCacheEntry(key, nextCache);
     res.setHeader('X-Cache', staleFallback ? 'REFRESHED' : 'MISS');
-    res.setHeader('Cache-Control', 'public, s-maxage=120, stale-while-revalidate=300');
+    res.setHeader('Cache-Control', `public, s-maxage=${EDGE_FRESH_S}, stale-while-revalidate=${EDGE_STALE_S}`);
     return res.status(200).json({ coins, cached: false });
   } catch (err) {
     if (staleFallback) {
       setLocalCacheEntry(key, staleFallback);
       res.setHeader('X-Cache', 'STALE_FALLBACK');
-      res.setHeader('Cache-Control', 'public, s-maxage=30, stale-while-revalidate=120');
+      res.setHeader('Cache-Control', `public, s-maxage=${EDGE_STALE_FALLBACK_S}, stale-while-revalidate=${EDGE_STALE_FALLBACK_REVALIDATE_S}`);
       return res.status(200).json({ coins: staleFallback.coins, cached: true, stale: true });
     }
     return res.status(500).json({ error: 'Coin search failed', details: err.message });
