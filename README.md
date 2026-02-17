@@ -36,6 +36,7 @@ A sophisticated web application that analyzes cryptocurrency markets in real-tim
 - **Catalyst Watch**: News sentiment + trending topic boost
 - **Liquidity Heat Map**: High-liquidity support/resistance node detection
 - **Signal Confluence Scoring**: Combines technical + derivatives + catalyst context
+- **OpenAI Reasoning (Optional)**: Upgrades explanation quality using structured LLM reasoning
 - **Real-time Data**: CoinGecko SDK API with automatic demo-data fallback
 
 ### 📊 Signal Output
@@ -125,6 +126,14 @@ echo COIN_SEARCH_EDGE_STALE_FALLBACK_REVALIDATE_S=1800 >> .env.local
 # Optional (production): Upstash Redis distributed cache
 echo UPSTASH_REDIS_REST_URL=https://your-upstash-endpoint >> .env.local
 echo UPSTASH_REDIS_REST_TOKEN=your_upstash_token >> .env.local
+
+# Optional: OpenAI reasoning enhancement
+echo OPENAI_API_KEY=your_openai_api_key >> .env.local
+echo OPENAI_MODEL=gpt-4.1-mini >> .env.local
+echo OPENAI_REASONING_ENABLED=true >> .env.local
+echo OPENAI_TEMPERATURE=0.2 >> .env.local
+echo OPENAI_MAX_OUTPUT_TOKENS=500 >> .env.local
+echo OPENAI_TIMEOUT_MS=6500 >> .env.local
 
 # Run development server
 npm run dev
@@ -235,6 +244,7 @@ Generate a trading signal programmatically.
 - `timeframe` (required): Analysis period (15m/1h/4h/1d)
 - `signalType` (required): Trading style (scalp/intraday/swing)
 - `riskTolerance` (required): Risk level (conservative/moderate/aggressive)
+- `useAI` (optional): `true/false` to force enable/disable OpenAI reasoning per request
 
 **Example Request:**
 ```bash

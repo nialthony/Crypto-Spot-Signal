@@ -281,7 +281,7 @@ export default function Home() {
                   aria-label="CREAO sponsor"
                 >
                   <img
-                    src="https://creao.ai/favicon.ico"
+                    src="https://image.pitchbook.com/up3cCFiKSj2jIsAKxTNB3ligmx01754048047683_200x200"
                     alt="CREAO logo"
                     width="24"
                     height="24"
