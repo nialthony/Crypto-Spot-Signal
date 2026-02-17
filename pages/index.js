@@ -85,17 +85,6 @@ function parseAnalyzeCommand(raw) {
 
 export default function Home() {
   const coinSearchCacheRef = useRef(new Map());
-  const headerRef = useRef(null);
-  const floatingLayerRef = useRef(null);
-  const floatingLogoRef = useRef(null);
-  const logoRafRef = useRef(null);
-  const logoMotionRef = useRef({
-    x: 0,
-    y: 0,
-    vx: -1.55,
-    vy: 1.2,
-    initialized: false,
-  });
   const [coinQuery, setCoinQuery] = useState(DEFAULT_COIN.name);
   const [commandInput, setCommandInput] = useState('analyze BTC');
   const [commandMessage, setCommandMessage] = useState('Run: analyze [symbol], then choose one result to auto analyze');
@@ -126,79 +115,6 @@ export default function Home() {
       window.localStorage.setItem('ui-theme', theme);
     }
   }, [theme]);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return undefined;
-    const layerEl = floatingLayerRef.current;
-    const logoEl = floatingLogoRef.current;
-    if (!layerEl || !logoEl) return undefined;
-
-    let running = true;
-    const resetMotion = (startFromRight = false) => {
-      const layerRect = layerEl.getBoundingClientRect();
-      const logoRect = logoEl.getBoundingClientRect();
-      const maxX = Math.max(0, layerRect.width - logoRect.width);
-      logoMotionRef.current.x = startFromRight ? maxX : Math.min(logoMotionRef.current.x, maxX);
-      logoMotionRef.current.y = 0;
-      logoMotionRef.current.vx = -Math.abs(logoMotionRef.current.vx || -1.55);
-      logoMotionRef.current.vy = Math.abs(logoMotionRef.current.vy || 1.2);
-      logoMotionRef.current.initialized = true;
-    };
-
-    const step = () => {
-      if (!running) return;
-      const layerRect = layerEl.getBoundingClientRect();
-      const logoRect = logoEl.getBoundingClientRect();
-      const maxX = Math.max(0, layerRect.width - logoRect.width);
-      const maxY = Math.max(0, layerRect.height - logoRect.height);
-      const motion = logoMotionRef.current;
-
-      if (!motion.initialized) {
-        motion.x = Math.min(motion.x, maxX);
-        motion.y = 0;
-        motion.initialized = true;
-      }
-
-      motion.x += motion.vx;
-      motion.y += motion.vy;
-
-      if (motion.x <= 0) {
-        motion.x = 0;
-        motion.vx = Math.abs(motion.vx);
-      } else if (motion.x >= maxX) {
-        motion.x = maxX;
-        motion.vx = -Math.abs(motion.vx);
-      }
-
-      if (motion.y <= 0) {
-        motion.y = 0;
-        motion.vy = Math.abs(motion.vy);
-      } else if (motion.y >= maxY) {
-        motion.y = maxY;
-        motion.vy = -Math.abs(motion.vy);
-      }
-
-      logoEl.style.transform = `translate(${motion.x}px, ${motion.y}px)`;
-      logoRafRef.current = window.requestAnimationFrame(step);
-    };
-
-    const handleResize = () => {
-      logoMotionRef.current.initialized = false;
-    };
-
-    resetMotion(true);
-    logoRafRef.current = window.requestAnimationFrame(step);
-    window.addEventListener('resize', handleResize);
-
-    return () => {
-      running = false;
-      window.removeEventListener('resize', handleResize);
-      if (logoRafRef.current) {
-        window.cancelAnimationFrame(logoRafRef.current);
-        logoRafRef.current = null;
-      }
-    };
-  }, []);
 
   async function searchCoinSuggestions(rawKeyword, options = {}) {
     const keyword = String(rawKeyword || coinQuery || '').trim();
@@ -350,15 +266,14 @@ export default function Home() {
         <div className="terminal-screen">
           <div className="container">
             {/* Header */}
-            <header ref={headerRef} className="header terminal-header">
+            <header className="header terminal-header">
               <div className="terminal-header-main">
                 <p className="terminal-line">$ boot catalyst8-signal --mode futures</p>
                 <h1>Catalyst8 Signal</h1>
                 <p>Terminal market intelligence with confluence, catalyst watch, and liquidity heat map</p>
               </div>
-              <div ref={floatingLayerRef} className="floating-logo-layer">
+              <div className="floating-logo-layer">
                 <a
-                  ref={floatingLogoRef}
                   className="sponsor-link floating-logo-link"
                   href="https://creao.ai"
                   target="_blank"

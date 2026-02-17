@@ -65,6 +65,7 @@
   --pulse-4: #4f7c62;
 
   --danger: #ff8c8c;
+  --floating-logo-size: 60px;
 }
 
 :root[data-theme='chalkboard'] {
@@ -317,6 +318,16 @@ body {
   }
 }
 
+@keyframes logoBounceX {
+  from { left: 0; }
+  to { left: calc(100% - var(--floating-logo-size)); }
+}
+
+@keyframes logoBounceY {
+  from { top: 0; }
+  to { top: calc(100% - var(--floating-logo-size)); }
+}
+
 .container {
   max-width: 1140px;
   margin: 0 auto;
@@ -431,11 +442,14 @@ body {
   position: absolute;
   top: 0;
   left: 0;
-  width: 60px;
-  height: 60px;
+  width: var(--floating-logo-size);
+  height: var(--floating-logo-size);
   pointer-events: auto;
   z-index: 9999;
-  will-change: transform;
+  will-change: top, left;
+  animation:
+    logoBounceX 8.8s linear infinite alternate-reverse,
+    logoBounceY 5.1s linear infinite alternate;
 }
 
 .sponsor-link:hover {
@@ -447,8 +461,8 @@ body {
 }
 
 .sponsor-logo {
-  width: 60px;
-  height: 60px;
+  width: var(--floating-logo-size);
+  height: var(--floating-logo-size);
   object-fit: contain;
   image-rendering: auto;
   display: block;
@@ -992,11 +1006,11 @@ body {
 
 @media (max-width: 760px) {
   body { padding: 8px 4px 16px; }
+  :root { --floating-logo-size: 52px; }
   .header h1 { font-size: 15px; }
   .header p { font-size: 22px; }
   .terminal-header { min-height: 120px; }
   .terminal-header-main { padding-right: 64px; }
-  .floating-logo-link { width: 52px; height: 52px; }
   .terminal-title { font-size: 8px; }
   .terminal-line { font-size: 19px; }
   .terminal-command-input { font-size: 24px; }
