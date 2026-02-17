@@ -45,6 +45,7 @@ function cacheKey(keyword, limit) {
 
 function buildStaticFallback(keyword, limit) {
   const q = String(keyword || '').toLowerCase();
+  const typedSymbol = String(keyword || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 15);
   const rows = Object.entries(SYMBOL_MAP).map(([pair, meta]) => {
     const symbol = String(pair).replace(/USDT$/, '');
     return {
@@ -56,12 +57,32 @@ function buildStaticFallback(keyword, limit) {
       thumb: '',
     };
   });
-  return rows
+  const merged = [];
+  if (typedSymbol) {
+    merged.push({
+      id: '',
+      name: typedSymbol,
+      symbol: typedSymbol,
+      pair: `${typedSymbol}USDT`,
+      marketCapRank: null,
+      thumb: '',
+    });
+  }
+  merged.push(...rows);
+  const uniq = [];
+  const seen = new Set();
+  for (const coin of merged) {
+    const key = `${coin.id || ''}:${coin.symbol}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    uniq.push(coin);
+  }
+  return uniq
     .filter((coin) => {
       if (!q) return true;
       return coin.name.toLowerCase().includes(q)
         || coin.symbol.toLowerCase().includes(q)
-        || coin.id.toLowerCase().includes(q);
+        || String(coin.id || '').toLowerCase().includes(q);
     })
     .slice(0, limit);
 }
