@@ -34,6 +34,7 @@ A sophisticated web application that analyzes cryptocurrency markets in real-tim
 - **Risk Tolerance Levels**: Conservative, Moderate, Aggressive
 - **Futures Pulse Layer**: Funding rate, long/short ratio, open interest trend
 - **Catalyst Watch**: News sentiment + trending topic boost
+- **Fundamental Layer**: Market structure, FDV/MCAP, liquidity, developer and community health scoring
 - **Liquidity Heat Map**: High-liquidity support/resistance node detection
 - **Signal Confluence Scoring**: Combines technical + derivatives + catalyst context
 - **OpenAI Reasoning (Optional)**: Upgrades explanation quality using structured LLM reasoning

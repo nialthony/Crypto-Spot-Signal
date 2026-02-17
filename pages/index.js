@@ -608,15 +608,47 @@ export default function Home() {
                     </div>
                   </div>
                   <div className="indicator-card">
+                    <div className="label">News Score</div>
+                    <div className={`value ${toneClass(data.catalystWatch.newsScore)}`}>
+                      {data.catalystWatch.newsScore ?? '-'}
+                    </div>
+                  </div>
+                  <div className="indicator-card">
+                    <div className="label">Fundamental Score</div>
+                    <div className={`value ${toneClass(data.catalystWatch.fundamentalScore)}`}>
+                      {data.catalystWatch.fundamentalScore ?? '-'}
+                    </div>
+                  </div>
+                  <div className="indicator-card">
                     <div className="label">Symbol Trending Rank</div>
                     <div className="value">
                       {data.catalystWatch.symbolTrendingRank ? `#${data.catalystWatch.symbolTrendingRank}` : '-'}
                     </div>
                   </div>
                 </div>
+                {(data.catalystWatch.newsSignals || []).slice(0, 2).map((item, idx) => (
+                  <div className="reason-item" key={`news-sig-${idx}`}>
+                    <span style={{ flexShrink: 0 }}>N{idx + 1}.</span>
+                    <span>{item.label} ({item.score >= 0 ? '+' : ''}{item.score})</span>
+                  </div>
+                ))}
+                {(data.catalystWatch.fundamentalSignals || []).slice(0, 2).map((item, idx) => (
+                  <div className="reason-item" key={`fund-sig-${idx}`}>
+                    <span style={{ flexShrink: 0 }}>F{idx + 1}.</span>
+                    <span>{item.label} ({item.score >= 0 ? '+' : ''}{item.score})</span>
+                  </div>
+                ))}
                 {(data.catalystWatch.catalysts || []).slice(0, 4).map((item, idx) => (
                   <div className="reason-item" key={`cat-${idx}`}>
                     <span style={{ flexShrink: 0 }}>{idx + 1}.</span>
+                    <span>
+                      [{item.sentiment}] {item.title} {item.source ? `(${item.source})` : ''}
+                    </span>
+                  </div>
+                ))}
+                {(data.catalystWatch.newsHighlights || []).slice(0, 2).map((item, idx) => (
+                  <div className="reason-item" key={`news-hl-${idx}`}>
+                    <span style={{ flexShrink: 0 }}>H{idx + 1}.</span>
                     <span>
                       [{item.sentiment}] {item.title} {item.source ? `(${item.source})` : ''}
                     </span>

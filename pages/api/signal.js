@@ -105,6 +105,8 @@ async function enhanceReasoningWithOpenAI(result) {
     futuresContext: result.futuresContext,
     catalystWatch: {
       sentimentLabel: result.catalystWatch?.sentimentLabel,
+      newsScore: result.catalystWatch?.newsScore,
+      fundamentalScore: result.catalystWatch?.fundamentalScore,
       combinedScore: result.catalystWatch?.combinedScore,
       symbolTrendingRank: result.catalystWatch?.symbolTrendingRank,
       catalysts: Array.isArray(result.catalystWatch?.catalysts)
@@ -204,9 +206,15 @@ function buildEmptyCatalystWatch() {
   return {
     sentimentScore: 0,
     trendBoost: 0,
+    newsScore: 0,
+    fundamentalScore: 0,
     combinedScore: 0,
     sentimentLabel: 'Neutral',
     symbolTrendingRank: null,
+    newsSignals: [],
+    fundamentalSignals: [],
+    newsHighlights: [],
+    fundamentalSnapshot: null,
     catalysts: [],
     trendingTopics: [],
   };
