@@ -398,29 +398,39 @@ body {
 .terminal-header {
   text-align: left;
   padding: 18px 0 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 16px;
+  position: relative;
+  overflow: hidden;
+  min-height: 132px;
 }
 
 .terminal-header-main {
-  flex: 1;
-  min-width: 0;
+  position: relative;
+  z-index: 1;
+  min-height: 96px;
+  padding-right: 76px;
 }
 
-.sponsor-bar {
-  display: flex;
-  align-items: center;
-  margin-top: 4px;
-  flex-shrink: 0;
+.floating-logo-layer {
+  position: absolute;
+  inset: 8px 8px 8px 8px;
+  pointer-events: none;
+  z-index: 2;
 }
 
 .sponsor-link {
-  display: inline-flex;
+  display: inline-block;
   align-items: center;
   text-decoration: none;
   line-height: 0;
+}
+
+.floating-logo-link {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 60px;
+  height: 60px;
+  pointer-events: auto;
 }
 
 .sponsor-link:hover {
@@ -979,6 +989,9 @@ body {
   body { padding: 8px 4px 16px; }
   .header h1 { font-size: 15px; }
   .header p { font-size: 22px; }
+  .terminal-header { min-height: 120px; }
+  .terminal-header-main { padding-right: 64px; }
+  .floating-logo-link { width: 52px; height: 52px; }
   .terminal-title { font-size: 8px; }
   .terminal-line { font-size: 19px; }
   .terminal-command-input { font-size: 24px; }
@@ -991,7 +1004,8 @@ body {
 @media (max-width: 520px) {
   .container { padding: 14px 9px 42px; }
   .terminal-topbar { gap: 8px; }
-  .terminal-header { align-items: flex-start; }
+  .terminal-header { min-height: 112px; }
+  .terminal-header-main { padding-right: 58px; }
   .terminal-command-row { flex-wrap: wrap; }
   .terminal-command-input { width: 100%; font-size: 22px; }
   .terminal-command-btn { width: 100%; }
