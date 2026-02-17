@@ -198,22 +198,45 @@ export default async function handler(req, res) {
 
     const localCached = getLocalCacheEntry(key);
     if (localCached && localCached.expiresAt > Date.now()) {
-      res.setHeader('X-Cache', 'HIT_LOCAL');
-      res.setHeader('Cache-Control', `public, s-maxage=${EDGE_FRESH_S}, stale-while-revalidate=${EDGE_STALE_S}`);
-      return res.status(200).json({ coins: localCached.coins, cached: true });
+      const cachedCoins = Array.isArray(localCached.coins) ? localCached.coins : [];
+      if (cachedCoins.length > 0) {
+        res.setHeader('X-Cache', 'HIT_LOCAL');
+        res.setHeader('Cache-Control', `public, s-maxage=${EDGE_FRESH_S}, stale-while-revalidate=${EDGE_STALE_S}`);
+        return res.status(200).json({ coins: cachedCoins, cached: true });
+      }
+      SEARCH_CACHE.delete(key);
     }
 
     const remoteCached = await getDistributedCacheEntry(key);
     if (remoteCached && remoteCached.expiresAt > Date.now()) {
-      setLocalCacheEntry(key, remoteCached);
-      res.setHeader('X-Cache', 'HIT_REMOTE');
-      res.setHeader('Cache-Control', `public, s-maxage=${EDGE_FRESH_S}, stale-while-revalidate=${EDGE_STALE_S}`);
-      return res.status(200).json({ coins: remoteCached.coins, cached: true });
+      const cachedCoins = Array.isArray(remoteCached.coins) ? remoteCached.coins : [];
+      if (cachedCoins.length > 0) {
+        setLocalCacheEntry(key, remoteCached);
+        res.setHeader('X-Cache', 'HIT_REMOTE');
+        res.setHeader('Cache-Control', `public, s-maxage=${EDGE_FRESH_S}, stale-while-revalidate=${EDGE_STALE_S}`);
+        return res.status(200).json({ coins: cachedCoins, cached: true });
+      }
     }
 
-    const staleFallback = pickStaleFallback(localCached, remoteCached);
+    const staleCandidate = pickStaleFallback(localCached, remoteCached);
+    const staleFallback = staleCandidate && Array.isArray(staleCandidate.coins) && staleCandidate.coins.length
+      ? staleCandidate
+      : null;
     const rawCoins = await searchCoinsWithDedup(key, keyword, safeLimit);
     const coins = Array.isArray(rawCoins) ? rawCoins : [];
+    if (!coins.length) {
+      const fallbackCoins = buildStaticFallback(keyword, safeLimit);
+      if (fallbackCoins.length) {
+        res.setHeader('X-Cache', 'EMPTY_RESULT_FALLBACK');
+        res.setHeader('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=120');
+        return res.status(200).json({
+          coins: fallbackCoins,
+          cached: false,
+          fallback: 'static-empty-upstream',
+          degraded: true,
+        });
+      }
+    }
     const nextCache = buildCacheEntry(coins);
     setLocalCacheEntry(key, nextCache);
     await setDistributedCacheEntry(key, nextCache);
@@ -228,7 +251,10 @@ export default async function handler(req, res) {
       const key = cacheKey(keyword, safeLimit);
       const localCached = getLocalCacheEntry(key);
       const remoteCached = await getDistributedCacheEntry(key);
-      const staleFallback = pickStaleFallback(localCached, remoteCached);
+      const staleCandidate = pickStaleFallback(localCached, remoteCached);
+      const staleFallback = staleCandidate && Array.isArray(staleCandidate.coins) && staleCandidate.coins.length
+        ? staleCandidate
+        : null;
 
       if (staleFallback) {
         setLocalCacheEntry(key, staleFallback);
